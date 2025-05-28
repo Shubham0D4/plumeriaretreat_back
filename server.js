@@ -16,16 +16,25 @@ app.use(express.urlencoded({ extended: true }));
 
 // Database connection
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'plumeria_retreat',
+  host: process.env.DB_HOST || 'sql8.freesqldatabase.com',
+  user: process.env.DB_USER || 'sql8781743',
+  password: process.env.DB_PASSWORD || 'hHLX9AUZ7c',
+  database: process.env.DB_NAME || 'sql8781743',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 };
 
 const pool = mysql.createPool(dbConfig);
+async function testConnection() {
+  try {
+    const connection = await pool.getConnection();
+    console.log('Database connected successfully');
+    connection.release();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+  }
+}
 
 // PayU Configuration
 const PAYU_CONFIG = {
@@ -463,9 +472,10 @@ app.use((error, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/api/health`);
+  await testConnection();
 });
 
 module.exports = app;
