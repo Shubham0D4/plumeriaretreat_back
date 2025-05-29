@@ -7,7 +7,7 @@ require('dotenv').config();
 
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(cors());
@@ -16,10 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Database connection
 const dbConfig = {
-  host: process.env.DB_HOST || 'sql8.freesqldatabase.com',
-  user: process.env.DB_USER || 'sql8781743',
-  password: process.env.DB_PASSWORD || 'hHLX9AUZ7c',
-  database: process.env.DB_NAME || 'sql8781743',
+  host: process.env.DB_HOST || 'mysql.railway.internal',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'XuzzPuWFCRujAWxdWZTSwVBFVKdnNnJT',
+  database: process.env.DB_NAME || 'railway',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
