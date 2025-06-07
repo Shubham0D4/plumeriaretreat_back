@@ -30,6 +30,13 @@ const dbConfig = {
   queueLimit: 0
 };
 
+// const dbConfig = {
+//   host: 'localhost',
+//   user: 'root',
+//   password: '2005',
+//   database: 'plumeria_retreat',
+// };
+
 const pool = mysql.createPool(dbConfig);
 async function testConnection() {
   try {
@@ -464,6 +471,78 @@ app.get('/api/blocked-dates', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch blocked dates' });
   }
 });
+
+
+async function executeQuery(query) {
+  try {
+    const [rows] = await pool.execute(query);
+    return rows;
+  } catch (error) {
+    console.error('Database query error:', error);
+    throw error;
+  }
+}
+
+
+app.get('/api/packages', async (req, res) => {
+  try {
+    const { active, limit, offset } = req.query;
+    
+    // `;
+    const query = `select * from packages`;
+    
+   
+    
+    const packages = await executeQuery(query);
+ 
+    
+    res.json(packages);
+  } catch (error) {
+    console.error('Error fetching packages:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to fetch packages'
+    });
+  }
+});
+
+// GET /api/packages/:id - Get single package by ID
+app.get('/api/packages/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const query = ` select * from packgaes where id = ? `;
+    
+    const packages = await executeQuery(query, [id]);
+    
+    if (packages.length === 0) {
+      return res.status(404).json({
+        error: 'Package not found'
+      });
+    }
+    
+    const pkg = packages[0];
+    const formattedPackage = {
+      ...pkg,
+      includes: pkg.includes ? JSON.parse(pkg.includes) : [],
+      accommodations: pkg.accommodations ? pkg.accommodations.split(',') : [],
+      services: pkg.services ? pkg.services.split(',') : [],
+      activities: pkg.activities ? pkg.activities.split(',') : [],
+      active: Boolean(pkg.active),
+      price: parseFloat(pkg.price)
+    };
+    
+    res.json(formattedPackage);
+  } catch (error) {
+    console.error('Error fetching package:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to fetch package'
+    });
+  }
+});
+
+
 
 // Health check
 app.get('/api/health', (req, res) => {
